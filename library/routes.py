@@ -1,55 +1,47 @@
 import os
-import bcrypt
+import MySQLdb
+from datetime import date
 from dotenv import load_dotenv
-from library import app
-from flask import render_template, redirect, flash, url_for, request
-from library.forms import register, login
-from library.database import register_user, validate_username, validate_password
-
 
 load_dotenv()
 
-@app.route("/", methods=['POST', 'GET'])
-@app.route("/home", methods=['POST', 'GET'])
-def index():
-	form = login()
+db = {'host': str(os.getenv('HOST')),
+		'user': str(os.getenv('USER')),
+		'password': str(os.getenv('PASS')),
+		'db': 'dbmaster'}
 
-	if form.validate_on_submit():
-		validated_username = validate_username(form.username.data)
-		validated_password = validate_password(form.password.data, os.getenv('SALT'))
+def register_user(first_name, last_name, phone_number, email, username, password):
+	conn = MySQLdb.connect(**db)
+	cursor = conn.cursor()
 
-		if (validated_username == True) and (validated_password == True):
-			flash(f'{form.username.data} welcome', category='success')
-			return redirect(url_for('index'))
-		elif (validated_username == False):
-			flash(f'{form.username.data} does not exist', category='danger')
-			return redirect(url_for('index'))
-		elif (validated_password == False):
-			flash(f'Password entered is incorrect', category='danger')
-			return redirect(url_for('index'))
-		else:
-			flash(f'Fatal Error')
-			return redirect(url_for('index'))
+	cursor.execute(""" INSERT INTO user_id (date_created, username, user_pass, first_name, last_name, email, phone_number) VALUES(%s, %s, %s, %s, %s, %s, %s) """, (date.today, username, password, first_name, last_name, email, phone_number))
+	conn.commit()
+	cursor.close()
+	conn.close()
 
-	return render_template('login.html', form=form)
+def validate_username(username_input):
+	conn = MySQLdb.connect(**db)
+	cursor = conn.cursor()
 
+	validated_username = cursor.execute("SELECT * FROM user_id WHERE username = %s", {username_input})
+	
+	if int(validated_username) == 1:
+		return True
+	else:
+		return False
 
-@app.route("/signup", methods=['POST', 'GET'])
-def signup():
-	form = register()
+	cursor.close()
+	conn.close()
 
-	if form.validate_on_submit():
-		if form.registration_number.data == os.getenv('REGISTRATION_NUMBER'):
-			flash(f'Account successfully created for {form.username.data}', category='success')
+def pull_password(username_input):
+	conn = MySQLdb.connect(**db)
+	cursor = conn.cursor()
 
-			
-			encrypted_password = request.form.get('password').encode('utf-8')
-			encrypted_password = bcrypt.hashpw(encrypted_password, os.getenv('SALT'))
-			register_user(form.first_name.data, form.last_name.data, form.phone_number.data, form.email.data, form.username.data, encrypted_password)
+	cursor.execute("SELECT * FROM user_id WHERE username = %s", {username_input})
 
-			return redirect(url_for('index'))
-		else:
-			flash(f'Registration number is invalid', category='danger')
-			return redirect(url_for('signup'))
+	validated_password = cursor.fetchone()
 
-	return render_template('signup.html', form=form)
+	return validated_password[3]
+
+	cursor.close()
+	conn.close()
