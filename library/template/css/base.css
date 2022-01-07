@@ -1,0 +1,57 @@
+.buttons{
+	margin-top: 5%;
+
+	text-align: center;
+}
+
+.button{
+	width: 100px
+}
+
+.no-border{
+	margin-top: 10%;
+	border: none;
+}
+
+.form-label{
+	color: white;
+	grid-area: label;
+	margin-left: 10%;
+	font-size: 0.875em;
+}
+
+.label-input{
+	margin-left: 10%;
+	grid-area: input;
+	font-size: 1.25em;
+	border: solid black 2px;
+	width: 75%;
+}
+
+.input-error{
+	border: solid red 5px;
+}
+
+.input-valid{
+	border: solid green 5px;
+}
+
+.error-label{
+	width: 50%;
+	text-align: center;
+}
+
+.alert{
+	text-align: center;
+}
+.alert-danger{
+	background-color: red;
+}
+
+.alert-success{
+	background-color: green;
+}
+.error-message{
+	margin: auto 33%;
+	text-align: center;
+}

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Sign-up</title>
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/base.css') }}">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='css/signup.css') }}">
+</head>
+<body>
+    <h1>Register new user</h1>
+    <div class="error-message">
+        {% with messages = get_flashed_messages(with_categories=True) %}
+            {% if messages %}
+                {% for catigory, message in messages %}
+                    <div class="alert alert-{{catigory}}">
+                        {{message}}
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+    </div>
+    <div>
+        <form method="POST">
+            {{ form.hidden_tag() }}
+            
+            <fieldset class="no-border">
+                <div>
+                    {{ form.username.label(class="form-label") }}
+                    {{ form.username(class="label-input") }}
+                </div>
+                <div>
+                    {{ form.password.label(class="form-label") }}
+                    {{ form.password(class="label-input") }}
+                </div>
+            </fieldset>
+
+            <div class="buttons">
+                    {{ form.login(class="button") }}
+                    {{ form.reset_password(class="button") }}
+            </div>
+        </form>
+    </div>
+</body>
+</html>
